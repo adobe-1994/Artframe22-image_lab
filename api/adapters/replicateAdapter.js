@@ -21,17 +21,24 @@ const VERSION_MAP = {
 };
 
 // ─── Map StandardInput → Replicate input for each task ─────────────────────
-function buildInput(task, std) {
+function buildInput(task, std, modelId) {
     switch (task) {
         case 'text-to-image':
-            return {
+            const t2iInput = {
                 prompt:              std.prompt,
                 aspect_ratio:        std.aspect_ratio        || 'match_input_image',
                 resolution:          std.resolution          || '2K',
                 output_format:       std.output_format       || 'jpg',
                 safety_filter_level: std.safety_filter_level || 'block_only_high',
-                ...(std.image_input?.length ? { image_input: std.image_input } : {}),
             };
+            if (std.image_input?.length) {
+                if (modelId && modelId.toLowerCase().includes('flux')) {
+                    t2iInput.image_prompt = std.image_input[0];
+                } else {
+                    t2iInput.image_input = std.image_input;
+                }
+            }
+            return t2iInput;
         case 'image-to-prompt':
             return {
                 prompt:               std.prompt               || 'Describe the image in detail.',
@@ -75,7 +82,7 @@ async function run(task, std) {
     const replicate = new Replicate({ auth: keys.replicate });
     const modelId   = override_model || DEFAULT_MODELS[task];
     const versionId = VERSION_MAP[modelId];
-    const input     = buildInput(task, std);
+    const input     = buildInput(task, std, modelId);
 
     const startMs   = Date.now();
     const createOpts = versionId ? { version: versionId, input } : { model: modelId, input };
