@@ -412,6 +412,18 @@
                         </select>
                     </div>
 
+                    <!-- negative_prompt -->
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-1.5 font-medium">negative_prompt <span class="lowercase text-gray-500 font-normal">string</span></label>
+                        <textarea id="t2i-negative" rows="2" class="w-full bg-sony-black border border-sony-gray p-3 text-xs text-sony-white focus:border-sony-white focus:outline-none transition-colors resize-y rounded-sm" placeholder="Things to avoid in the generated image"></textarea>
+                    </div>
+
+                    <!-- seed -->
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-1.5 font-medium">seed <span class="lowercase text-gray-500 font-normal">integer</span></label>
+                        <input type="number" id="t2i-seed" class="w-full bg-sony-black border border-sony-gray p-3 text-xs text-sony-white focus:border-sony-white focus:outline-none rounded-sm" placeholder="Leave empty for random seed">
+                    </div>
+
                     <!-- Model Selector: T2I -->
                     <div class="model-selector-wrap">
                         <div class="model-selector-row">
@@ -1274,6 +1286,8 @@
             document.getElementById('t2i-resolution').value = '2K';
             document.getElementById('t2i-format').value = 'jpg';
             document.getElementById('t2i-safety').value = 'block_only_high';
+            document.getElementById('t2i-negative').value = '';
+            document.getElementById('t2i-seed').value = '';
             showToast("Đã đặt lại thông số mặc định");
         }
 
@@ -1619,6 +1633,8 @@
             const resolution = document.getElementById('t2i-resolution').value;
             const outputFormat = document.getElementById('t2i-format').value;
             const safetyLevel = document.getElementById('t2i-safety').value;
+            const negativePrompt = document.getElementById('t2i-negative').value.trim();
+            const seed = document.getElementById('t2i-seed').value;
             const fileInput = document.getElementById('t2i-files');
 
             const btn = document.getElementById('btn-t2i');
@@ -1641,6 +1657,8 @@
                     resolution,
                     output_format: outputFormat,
                     safety_filter_level: safetyLevel,
+                    negative_prompt: negativePrompt,
+                    ...(seed ? { seed: parseInt(seed) } : {}),
                     image_input: []
                 };
 

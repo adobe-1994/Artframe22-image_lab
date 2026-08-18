@@ -31,6 +31,14 @@ function buildInput(task, std, modelId) {
                 output_format:       std.output_format       || 'jpg',
                 safety_filter_level: std.safety_filter_level || 'block_only_high',
             };
+            
+            if (std.negative_prompt) {
+                t2iInput.negative_prompt = std.negative_prompt;
+            }
+            if (std.seed !== undefined) {
+                t2iInput.seed = std.seed;
+            }
+            
             if (std.image_input?.length) {
                 if (modelId && modelId.toLowerCase().includes('flux')) {
                     t2iInput.image_prompt = std.image_input[0];
