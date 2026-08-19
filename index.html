@@ -412,6 +412,18 @@
                         </select>
                     </div>
 
+                    <!-- negative_prompt -->
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-1.5 font-medium">negative_prompt <span class="lowercase text-gray-500 font-normal">string</span></label>
+                        <textarea id="t2i-negative" rows="2" class="w-full bg-sony-black border border-sony-gray p-3 text-xs text-sony-white focus:border-sony-white focus:outline-none transition-colors resize-y rounded-sm" placeholder="Things to avoid in the generated image"></textarea>
+                    </div>
+
+                    <!-- seed -->
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-1.5 font-medium">seed <span class="lowercase text-gray-500 font-normal">integer</span></label>
+                        <input type="number" id="t2i-seed" class="w-full bg-sony-black border border-sony-gray p-3 text-xs text-sony-white focus:border-sony-white focus:outline-none rounded-sm" placeholder="Leave empty for random seed">
+                    </div>
+
                     <!-- Model Selector: T2I -->
                     <div class="model-selector-wrap">
                         <div class="model-selector-row">
@@ -920,7 +932,7 @@
                 replicate: [
                     { label: 'Imagen 4 Ultra – Nano Banana 2 (Default)', value: 'google/nano-banana-2' },
                     { label: 'FLUX 1.1 Pro', value: 'black-forest-labs/flux-1.1-pro' },
-                    { label: 'FLUX Schnell (Fast)', value: 'black-forest-labs/flux-schnell' },
+                    { label: 'Nano Banana 2 Lite', value: 'google/nano-banana-2-lite' },
                     { label: 'FLUX Kontext Pro', value: 'black-forest-labs/flux-kontext-pro' },
                     { label: 'Stable Diffusion 3.5 Large', value: 'stability-ai/stable-diffusion-3.5-large' },
                     { label: '— Custom —', value: '__custom__' },
@@ -948,8 +960,8 @@
             'i2p': {
                 replicate: [
                     { label: 'Claude 4.5 Haiku (Default)', value: 'anthropic/claude-4.5-haiku' },
-                    { label: 'Llama 4 Scout', value: 'meta/llama-4-scout' },
-                    { label: 'Llama 4 Maverick', value: 'meta/llama-4-maverick' },
+                    { label: 'Llama 3.2 11B Vision', value: 'meta/llama-3.2-11b-vision-instruct' },
+                    { label: 'Llama 3.2 90B Vision', value: 'meta/llama-3.2-90b-vision-instruct' },
                     { label: '— Custom —', value: '__custom__' },
                 ],
                 gemini: [
@@ -1274,6 +1286,8 @@
             document.getElementById('t2i-resolution').value = '2K';
             document.getElementById('t2i-format').value = 'jpg';
             document.getElementById('t2i-safety').value = 'block_only_high';
+            document.getElementById('t2i-negative').value = '';
+            document.getElementById('t2i-seed').value = '';
             showToast("Đã đặt lại thông số mặc định");
         }
 
@@ -1619,6 +1633,8 @@
             const resolution = document.getElementById('t2i-resolution').value;
             const outputFormat = document.getElementById('t2i-format').value;
             const safetyLevel = document.getElementById('t2i-safety').value;
+            const negativePrompt = document.getElementById('t2i-negative').value.trim();
+            const seed = document.getElementById('t2i-seed').value;
             const fileInput = document.getElementById('t2i-files');
 
             const btn = document.getElementById('btn-t2i');
@@ -1641,6 +1657,8 @@
                     resolution,
                     output_format: outputFormat,
                     safety_filter_level: safetyLevel,
+                    negative_prompt: negativePrompt,
+                    ...(seed ? { seed: parseInt(seed) } : {}),
                     image_input: []
                 };
 
