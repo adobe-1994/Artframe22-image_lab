@@ -908,6 +908,13 @@
             </div>
             
             <div id="global-canvas-content" class="hidden flex flex-grow flex-col items-center justify-center border border-sony-gray bg-sony-dark rounded-sm overflow-hidden p-2 relative">
+                <div id="global-loading-overlay" class="absolute inset-0 bg-sony-dark/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 hidden">
+                    <div class="relative w-12 h-12 flex items-center justify-center mb-3">
+                        <div class="absolute inset-0 border-2 border-sony-gray rounded-full animate-ping opacity-20"></div>
+                        <div class="absolute inset-1 border-2 border-t-sony-white border-sony-gray rounded-full animate-spin"></div>
+                    </div>
+                    <p class="text-[10px] tracking-widest uppercase text-sony-white animate-pulse">Đang xử lý...</p>
+                </div>
                 <img id="global-img" src="" class="max-w-full max-h-full object-contain hidden" />
                 <div id="global-text-container" class="w-full h-full p-6 bg-sony-black overflow-y-auto hidden">
                     <p class="text-[11px] text-gray-400 mb-3 uppercase tracking-widest border-b border-sony-gray pb-2">Generated Prompt</p>
@@ -1187,13 +1194,35 @@
             }
         }
 
+        function showGlobalLoading() {
+            if (!isSplitMode) return;
+            const emptyState = document.getElementById('global-canvas-empty');
+            const contentState = document.getElementById('global-canvas-content');
+            const loadingOverlay = document.getElementById('global-loading-overlay');
+            const metricsGlobal = document.getElementById('metrics-global');
+            
+            metricsGlobal.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            contentState.classList.remove('hidden');
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideGlobalLoading() {
+            const loadingOverlay = document.getElementById('global-loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
         function updateGlobalCanvas(type, data) {
             const emptyState = document.getElementById('global-canvas-empty');
             const contentState = document.getElementById('global-canvas-content');
+            const loadingOverlay = document.getElementById('global-loading-overlay');
             const imgEl = document.getElementById('global-img');
             const textContainer = document.getElementById('global-text-container');
             const textEl = document.getElementById('global-text');
 
+            loadingOverlay.classList.add('hidden');
             emptyState.classList.add('hidden');
             contentState.classList.remove('hidden');
 
@@ -1645,10 +1674,11 @@
             btn.disabled = true;
             spinner.classList.remove('hidden');
             resultBox.classList.add('hidden');
+            showGlobalLoading();
 
             try {
                 const params = getPlatformParams('t2i', 'replicate');
-                if (!params) { btn.disabled = false; spinner.classList.add('hidden'); return; }
+                if (!params) { btn.disabled = false; spinner.classList.add('hidden'); hideGlobalLoading(); return; }
 
                 const payload = {
                     ...params,
@@ -1694,8 +1724,7 @@
                 console.error(error);
                 showToast(error.message || "Lỗi khi tạo ảnh.", true);
             } finally {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
+                btn.disabled = false; spinner.classList.add('hidden'); hideGlobalLoading();
             }
         }
 
@@ -1719,10 +1748,11 @@
             btn.disabled = true;
             spinner.classList.remove('hidden');
             resultBox.classList.add('hidden');
+            showGlobalLoading();
 
             try {
                 const params = getPlatformParams(prefix, 'replicate');
-                if (!params) { btn.disabled = false; spinner.classList.add('hidden'); return; }
+                if (!params) { btn.disabled = false; spinner.classList.add('hidden'); hideGlobalLoading(); return; }
 
                 const payload = { ...params };
                 let endpoint = '';
@@ -1775,8 +1805,7 @@
                 console.error(error);
                 showToast(error.message || "Lỗi xử lý hình ảnh.", true);
             } finally {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
+                btn.disabled = false; spinner.classList.add('hidden'); hideGlobalLoading();
             }
         }
 
@@ -1801,10 +1830,11 @@
             btn.disabled = true;
             spinner.classList.remove('hidden');
             resultBox.classList.add('hidden');
+            showGlobalLoading();
 
             try {
                 const params = getPlatformParams('i2p', 'replicate');
-                if (!params) { btn.disabled = false; spinner.classList.add('hidden'); return; }
+                if (!params) { btn.disabled = false; spinner.classList.add('hidden'); hideGlobalLoading(); return; }
 
                 const payload = {
                     ...params,
@@ -1841,8 +1871,7 @@
                 console.error(error);
                 showToast(error.message || "Lỗi phân tích.", true);
             } finally {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
+                btn.disabled = false; spinner.classList.add('hidden'); hideGlobalLoading();
             }
         }
     </script>
